@@ -18,11 +18,16 @@ jobs:
       - name: Importar o código-fonte do ZIP
         shell: bash
         run: |
-          test -s Jardim_do_Fim_codigo_fonte_para_GitHub.zip
-          mkdir .source-import
-          unzip -q Jardim_do_Fim_codigo_fonte_para_GitHub.zip -d .source-import
-          cp -a .source-import/. .
-          rm -rf .source-import Jardim_do_Fim_codigo_fonte_para_GitHub.zip
+          if [ -f Jardim_do_Fim_codigo_fonte_para_GitHub.zip ]; then
+            mkdir .source-import
+            unzip -q Jardim_do_Fim_codigo_fonte_para_GitHub.zip -d .source-import
+            cp -a .source-import/. .
+            rm -rf .source-import Jardim_do_Fim_codigo_fonte_para_GitHub.zip
+            # The GitHub App token cannot push workflow files; create them through the GitHub API instead.
+            rm -f .github/workflows/build-game.yml
+          else
+            echo "ZIP já importado; executando apenas a compilação."
+          fi
 
       - name: Registrar o código-fonte no repositório
         shell: bash
