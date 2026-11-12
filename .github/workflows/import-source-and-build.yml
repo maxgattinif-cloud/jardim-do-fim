@@ -1,0 +1,65 @@
+name: Importar e compilar Jardim do Fim
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Jardim_do_Fim_codigo_fonte_para_GitHub.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  import-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Importar o código-fonte do ZIP
+        shell: bash
+        run: |
+          test -s Jardim_do_Fim_codigo_fonte_para_GitHub.zip
+          mkdir .source-import
+          unzip -q Jardim_do_Fim_codigo_fonte_para_GitHub.zip -d .source-import
+          cp -a .source-import/. .
+          rm -rf .source-import Jardim_do_Fim_codigo_fonte_para_GitHub.zip
+
+      - name: Registrar o código-fonte no repositório
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Importar código-fonte do Jardim do Fim"
+            git push
+          fi
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar TypeScript
+        run: npx tsc --noEmit
+
+      - name: Compilar jogo HTML5
+        run: npm run build
+
+      - name: Conferir arquivo final
+        run: test -s dist/index.html
+
+      - name: Disponibilizar jogo compilado
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jardim-do-Fim-HTML5
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
