@@ -1,10 +1,7 @@
 name: Importar e compilar Jardim do Fim
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "Jardim_do_Fim_codigo_fonte_para_GitHub.zip"
+  workflow_dispatch:
 
 permissions:
   contents: write
