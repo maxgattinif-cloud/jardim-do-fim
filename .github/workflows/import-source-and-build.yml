@@ -62,7 +62,7 @@ jobs:
       - name: Simular as fases da campanha
         run: |
           npx esbuild tests/sim.test.ts --bundle --platform=node --format=cjs --outfile=/tmp/sim.cjs
-          RUNS=1 node /tmp/sim.cjs
+          RUNS=3 node /tmp/sim.cjs
 
       - name: Compilar jogo HTML5
         run: npm run build
