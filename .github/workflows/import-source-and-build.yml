@@ -54,6 +54,16 @@ jobs:
       - name: Verificar TypeScript
         run: npx tsc --noEmit
 
+      - name: Testar conteúdo e funcionamento das unidades
+        run: |
+          npx esbuild tests/content.test.ts --bundle --platform=node --format=cjs --outfile=/tmp/content.cjs
+          node /tmp/content.cjs
+
+      - name: Simular as fases da campanha
+        run: |
+          npx esbuild tests/sim.test.ts --bundle --platform=node --format=cjs --outfile=/tmp/sim.cjs
+          RUNS=1 node /tmp/sim.cjs
+
       - name: Compilar jogo HTML5
         run: npm run build
 
