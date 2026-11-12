@@ -1,6 +1,8 @@
 name: Importar e compilar Jardim do Fim
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
