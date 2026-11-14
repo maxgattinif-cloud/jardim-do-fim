@@ -33,7 +33,7 @@ export function SaveProvider({ children }: { children: ReactNode }) {
   const ref = useRef(save);
   ref.current = save;
 
-  useEffect(() => persist(save), [save]);
+  useEffect(() => { persist(save); }, [save]);
   useEffect(() => {
     const s = save.settings;
     sound.setVolumes({ master: s.master, music: s.music, sfx: s.sfx });
