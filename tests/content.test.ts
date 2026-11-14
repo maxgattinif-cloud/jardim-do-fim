@@ -6,6 +6,7 @@ import { FINAL_LEVEL } from "../src/data/rules";
 import { COMBOS } from "../src/data/combos";
 import { boardFor } from "../src/data/worlds";
 import { availableDefs } from "../src/game/decks";
+import { HostSession } from "../src/net/session";
 import { GardenEngine } from "../src/game/engine";
 import { cellX } from "../src/game/geometry";
 import { roleOfSeat, recomputeCombos } from "../src/game/expansion";
@@ -20,6 +21,20 @@ const avail = availableDefs(50, ALL_ACH);
 function cfg(loadout: string[], opts: { levels?: any; role?: any; seed?: number; mirror?: boolean } = {}): MatchCfg {
   const seats: SeatCfg[] = [{ name: "Teste", kind: "human", color: "#fff", loadout, levels: opts.levels ?? {}, aura: "aura_esmeralda", shot: "shot_padrao", role: opts.role }];
   return { mid: 1, level: 25, mode: "campaign", seats, seed: opts.seed ?? 4242, mods: [], emphasis: [], rewardMul: 1 };
+}
+
+{
+  const selected = ["luminia", "espinheiro", "tronco", "magma", "gelidea", "musgo"] as const;
+  const host = new HostSession({
+    bus: null,
+    room: "TESTE",
+    profile: { name: "Teste", levels: {}, aura: "aura_esmeralda", shot: "shot_padrao", loadout: [...selected], role: "comandante" },
+    avail,
+  });
+  host.configure({ level: 2, mode: "campaign" });
+  const started = host.start();
+  ok(!!started && started.seats[0].loadout.join(",") === selected.join(","), "modo solo respeita o deck escolhido pelo jogador");
+  host.dispose();
 }
 
 console.log("\n[A] 50 fases / 5 mundos");
