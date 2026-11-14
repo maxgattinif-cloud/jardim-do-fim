@@ -34,7 +34,7 @@ export function ProfileScreen({ onComplete }: { onComplete: () => void }) {
         />
         {error && <p className="mt-2 text-center text-xs text-red-300">{error}</p>}
         <Btn big className="mt-4 w-full" onClick={submit}>Salvar perfil e jogar</Btn>
-        <p className="mt-3 text-center text-[11px] leading-relaxed text-white/45">Não é necessário e-mail nem senha. O progresso fica salvo neste navegador e neste aparelho.</p>
+        <p className="mt-3 text-center text-[11px] leading-relaxed text-white/45">Não é necessário e-mail nem senha. Com o salvamento da CrazyGames habilitado, seu progresso também pode sincronizar entre dispositivos.</p>
       </div>
     </Screen>
   );
