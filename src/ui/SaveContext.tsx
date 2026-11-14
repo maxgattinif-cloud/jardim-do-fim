@@ -19,6 +19,7 @@ interface Api {
   claimQuest: (id: string, reward: number) => void;
   patch: (fn: (s: Save) => Save) => void;
   rename: (n: string) => void;
+  register: (n: string) => boolean;
   exportSave: () => string;
   importSave: (text: string) => boolean;
   reset: () => void;
@@ -53,6 +54,7 @@ export function SaveProvider({ children }: { children: ReactNode }) {
       apply: (r) => {
         const out = applyResult(ref.current, r);
         ref.current = out.save;
+        persist(out.save);
         setSave(out.save);
         return out.summary;
       },
@@ -82,6 +84,15 @@ export function SaveProvider({ children }: { children: ReactNode }) {
         setSave((s) => ({ ...s, coins: s.coins + reward, quests: { ...s.quests, list: s.quests.list.map((q) => (q.id === id ? { ...q, claimed: true } : q)) } })),
       patch,
       rename: (n) => setSave((s) => ({ ...s, name: sanitizeName(n, s.name) })),
+      register: (n) => {
+        const clean = sanitizeName(n).trim();
+        if (!clean) return false;
+        const next = { ...ref.current, name: clean, profileReady: true };
+        ref.current = next;
+        persist(next);
+        setSave(next);
+        return true;
+      },
       exportSave: () => JSON.stringify(ref.current, null, 2),
       importSave: (text) => {
         try {
