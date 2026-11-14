@@ -111,15 +111,55 @@ export function normalize(raw: unknown): Save {
   return s;
 }
 
+type SaveStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+function platformStorage(): SaveStorage | null {
+  const sdk = typeof window !== "undefined" ? window.CrazyGames?.SDK : undefined;
+  if (!sdk || sdk.environment === "disabled" || !sdk.data) return null;
+  return sdk.data;
+}
+
+function localStorageSafe(): SaveStorage | null {
+  try {
+    return typeof localStorage !== "undefined" ? localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Prefere o Data Module da CrazyGames; fora da plataforma usa o armazenamento local. */
+function readStored(key: string): string | null {
+  const platform = platformStorage();
+  if (platform) {
+    try {
+      const value = platform.getItem(key);
+      if (value !== null) return value;
+    } catch {
+      // O Data Module pode estar desativado na configuração de envio.
+    }
+  }
+  const local = localStorageSafe();
+  if (!local) return null;
+  try {
+    const value = local.getItem(key);
+    if (value !== null && platform) {
+      try { platform.setItem(key, value); } catch { /* mantém a cópia local */ }
+    }
+    return value;
+  } catch {
+    return null;
+  }
+}
+
 export function loadSave(): Save {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    const raw = readStored(SAVE_KEY);
     if (raw) return normalize(JSON.parse(raw));
     // migração dos dados salvos pelas versões anteriores
     const d = defaultSave();
-    const oldLevel = Number(localStorage.getItem(OLD_PROGRESS));
+    const oldLevel = Number(readStored(OLD_PROGRESS));
     if (oldLevel >= 2) d.completed = Math.min(50, oldLevel - 1);
-    const oldSave = localStorage.getItem(OLD_SAVE);
+    const oldSave = readStored(OLD_SAVE);
     if (oldSave) {
       const o = JSON.parse(oldSave) as { coins?: number; name?: string };
       if (typeof o.coins === "number") d.coins = Math.max(d.coins, Math.floor(o.coins));
@@ -132,13 +172,33 @@ export function loadSave(): Save {
 }
 
 export function persist(s: Save): boolean {
+  const value = JSON.stringify(s);
+  const platform = platformStorage();
+  if (platform) {
+    try {
+      platform.setItem(SAVE_KEY, value);
+      return true;
+    } catch {
+      // Se o Data Module estiver indisponível, preserva o progresso localmente.
+    }
+  }
+  const local = localStorageSafe();
+  if (!local) return false;
   try {
-    const value = JSON.stringify(s);
-    localStorage.setItem(SAVE_KEY, value);
-    return localStorage.getItem(SAVE_KEY) === value;
+    local.setItem(SAVE_KEY, value);
+    return local.getItem(SAVE_KEY) === value;
   } catch {
     return false;
   }
+}
+
+export function clearSavedData(): void {
+  const platform = platformStorage();
+  if (platform) {
+    try { platform.removeItem(SAVE_KEY); } catch { /* tenta limpar a cópia local */ }
+  }
+  const local = localStorageSafe();
+  try { local?.removeItem(SAVE_KEY); } catch { /* armazenamento indisponível */ }
 }
 
 /** Renova as missões diárias quando o dia muda. */
