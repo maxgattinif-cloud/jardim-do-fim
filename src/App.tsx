@@ -6,6 +6,7 @@ import { sound } from "./game/sound";
 import { finishCrazyGamesLoading, setCrazyGamesGameplay } from "./services/crazygames";
 import { SaveProvider, useSave } from "./ui/SaveContext";
 import { TitleScreen } from "./ui/TitleScreen";
+import { ProfileScreen } from "./ui/ProfileScreen";
 import { MainMenu, type Dest } from "./ui/MainMenu";
 import { CampaignScreen } from "./ui/CampaignScreen";
 import { CollectionScreen } from "./ui/CollectionScreen";
@@ -13,7 +14,7 @@ import { LobbyScreen, type LobbyInit, type Sess } from "./ui/LobbyScreen";
 import { MatchScreen } from "./ui/MatchScreen";
 import { CosmeticsScreen, QuestsScreen, RankingScreen, SettingsScreen } from "./ui/Extras";
 
-type Screen = "title" | "menu" | "campaign" | "lobby" | "match" | "collection" | "quests" | "cosmetics" | "ranking" | "settings";
+type Screen = "title" | "profile" | "menu" | "campaign" | "lobby" | "match" | "collection" | "quests" | "cosmetics" | "ranking" | "settings";
 
 function Shell() {
   const { save, avail } = useSave();
@@ -130,7 +131,8 @@ function Shell() {
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {screen === "title" && <TitleScreen onStart={() => setScreen("menu")} />}
+      {screen === "title" && <TitleScreen onStart={() => setScreen(save.profileReady ? "menu" : "profile")} />}
+      {screen === "profile" && <ProfileScreen onComplete={() => setScreen("menu")} />}
       {screen === "menu" && <MainMenu go={go} />}
       {screen === "campaign" && <CampaignScreen onBack={() => setScreen("menu")} onSolo={(n) => openLobby({ level: n, mode: "campaign", entry: "offline" })} />}
       {screen === "collection" && <CollectionScreen onBack={() => setScreen("menu")} />}
@@ -164,7 +166,9 @@ function Shell() {
             const h = sess.s;
             h.backToLobby();
             h.configure({ level });
-            if (h.start()) setHandle(h.matchHandle());
+            setInit({ level, mode: "campaign", entry: "offline" });
+            setHandle(null);
+            setScreen("lobby");
           }}
           onLobby={() => {
             if (sess.role === "host") sess.s.backToLobby();
