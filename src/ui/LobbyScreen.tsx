@@ -303,7 +303,7 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
               <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-black ring-1 ring-white/10">{Math.min(pick.length, slots)}/{slots}</span>
             </div>
             {solo ? (
-              <p className="mt-1 text-xs text-white/60">Escolha até {slots} defensores para esta fase. As plantas recém-desbloqueadas já aparecem disponíveis aqui.</p>
+              <p className="mt-1 text-xs text-white/60">Escolha de 3 a {slots} defensores para esta fase. As plantas recém-desbloqueadas já aparecem disponíveis aqui.</p>
             ) : (
               <p className="mt-1 text-xs text-white/60">Escolha até {slots}. A equipe compartilha a seiva; os aliados IA completam o que faltar.</p>
             )}
@@ -359,7 +359,7 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
           </section>
 
           {host ? (
-            <Btn big className="w-full" onClick={() => { const cfg = host.start(); if (cfg) onStart(host.matchHandle()); }} disabled={!choice ? false : pick.length === 0}>
+            <Btn big className="w-full" onClick={() => { const cfg = host.start(); if (cfg) onStart(host.matchHandle()); }} disabled={pick.length < 3}>
               ▶ Iniciar {roomMode === "tutorial" ? "treino" : `fase ${level}`}
             </Btn>
           ) : (
