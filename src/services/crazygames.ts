@@ -2,9 +2,16 @@
 import { sound } from "../game/sound";
 
 type CrazyGamesSettings = { muteAudio?: boolean; disableChat?: boolean };
+type CrazyGamesDataStore = {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+  clear: () => void;
+};
 type CrazyGamesSdk = {
   init: () => Promise<void>;
   environment?: string;
+  data?: CrazyGamesDataStore;
   game: {
     gameplayStart: () => void;
     gameplayStop: () => void;
