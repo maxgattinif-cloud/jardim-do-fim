@@ -86,10 +86,10 @@ export function SaveProvider({ children }: { children: ReactNode }) {
       rename: (n) => setSave((s) => ({ ...s, name: sanitizeName(n, s.name) })),
       register: (n) => {
         const clean = sanitizeName(n).trim();
-        if (!clean) return false;
+        if (clean.length < 2 || clean === "Guardião") return false;
         const next = { ...ref.current, name: clean, profileReady: true };
+        if (!persist(next)) return false;
         ref.current = next;
-        persist(next);
         setSave(next);
         return true;
       },
