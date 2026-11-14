@@ -6,7 +6,7 @@ import { AI_NAMES, CHOICE_MIN_PLAYERS, MAX_PLAYERS, SEAT_COLORS, slotsFor } from
 import { createBus, makePeerId, makeRoomCode, type BusKind } from "../net/bus";
 import { ClientSession, HostSession, type MatchHandle, type Profile } from "../net/session";
 import type { Mode } from "../game/types";
-import { soloDeck } from "../game/decks";
+import { sanitizeLoadout, soloDeck } from "../game/decks";
 import { Btn, Chip, Screen, Sprite } from "./common";
 import { ROLES, ROLE_BY_ID, ROLE_ORDER } from "../data/roles";
 import { useSave } from "./SaveContext";
