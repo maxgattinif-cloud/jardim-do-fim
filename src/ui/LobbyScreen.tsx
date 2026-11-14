@@ -20,19 +20,22 @@ export interface LobbyInit {
   entry: "setup" | "offline";
 }
 
-const DEFAULT_PICK: DefId[] = ["luminia", "espinheiro", "tronco", "gelidea", "magma", "musgo"];
-
 export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: LobbyInit; sess: Sess | null; setSess: (s: Sess | null) => void; onStart: (h: MatchHandle) => void; onBack: () => void }) {
   const { save, avail, unlockedLevel, patch } = useSave();
   const [, bump] = useReducer((x: number) => x + 1, 0);
   const [kind, setKind] = useState<BusKind>("tabs");
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
-  const [pick, setPick] = useState<DefId[]>(() => DEFAULT_PICK.filter((d) => avail.includes(d)).slice(0, 6));
+  const [pick, setPick] = useState<DefId[]>(() => {
+    const saved = sanitizeLoadout(save.loadout, avail, 6);
+    return saved.length ? saved : soloDeck(avail, init.level);
+  });
   const [myRole, setMyRole] = useState<"comandante" | "agricultor" | "atirador" | "curandeiro" | "guarda" | "tatico">(ROLE_ORDER[0]);
   const [copied, setCopied] = useState(false);
 
   const profile = (): Profile => ({ name: save.name, levels: save.defLevels, aura: save.cosmetics.aura, shot: save.cosmetics.shot, loadout: pick, role: myRole });
+
+  useEffect(() => patch((s) => ({ ...s, loadout: pick })), [pick, patch]);
 
   // assina atualizações da sessão
   useEffect(() => {
@@ -174,7 +177,6 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
   const classes = new Set<DefClass>([...team].map((d) => DEF_BY_ID[d].cls));
   const offline = sess.role === "host" && sess.kind === "offline";
   const solo = (lobby?.seats.length ?? 1) < CHOICE_MIN_PLAYERS;
-  const soloKit = soloDeck(avail, level);
 
   const title = roomMode === "daily" ? "Desafio Diário" : roomMode === "tutorial" ? "Treino" : offline ? "Preparar partida" : "Sala cooperativa";
   const lost = status === "lost" || status === "closed" || status === "rejected";
@@ -298,44 +300,33 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
           <section className="glass rounded-2xl p-4">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-2xl">{solo ? "Kit da fase" : "Seu deck"}</h2>
-              <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-black ring-1 ring-white/10">{solo ? soloKit.length : Math.min(pick.length, slots)}/{slots}</span>
+              <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-black ring-1 ring-white/10">{Math.min(pick.length, slots)}/{slots}</span>
             </div>
             {solo ? (
-              <>
-                <p className="mt-1 text-xs text-white/60">Sozinho você joga com 4 defensores-base e 2 destaques que mudam a cada fase. <b>A escolha livre abre com {CHOICE_MIN_PLAYERS}+ participantes</b> (adicione um aliado IA ou chame alguém).</p>
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {soloKit.map((d) => (
-                    <div key={d} className="rounded-xl bg-black/30 p-2 text-center ring-1 ring-white/8">
-                      <div className="grid place-items-center"><Sprite kind="def" id={d} size={56} animate={false} /></div>
-                      <div className="mt-1 truncate text-[11px] font-bold">{DEF_BY_ID[d].name}</div>
-                    </div>
-                  ))}
-                </div>
-              </>
+              <p className="mt-1 text-xs text-white/60">Escolha até {slots} defensores para esta fase. As plantas recém-desbloqueadas já aparecem disponíveis aqui.</p>
             ) : (
-              <>
-                <p className="mt-1 text-xs text-white/60">Escolha até {slots}. A equipe compartilha a seiva; os aliados IA completam o que faltar.</p>
-                <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {DEFENDERS.map((d) => {
-                    const has = avail.includes(d.id);
-                    const on = pick.includes(d.id);
-                    return (
-                      <button
-                        key={d.id}
-                        disabled={!has}
-                        onClick={() => setPick((p) => (p.includes(d.id) ? p.filter((x) => x !== d.id) : p.length >= slots ? p : [...p, d.id]))}
-                        className={`relative rounded-xl p-1.5 text-center ring-2 transition ${on ? "bg-[#2ee6c5]/15 ring-[#2ee6c5]" : "bg-black/30 ring-white/6 hover:ring-white/25"} ${!has ? "opacity-40" : ""}`}
-                        title={has ? d.power : "Ainda bloqueado"}
-                      >
-                        <div className="grid place-items-center"><Sprite kind="def" id={d.id} size={52} animate={false} dark={!has} /></div>
-                        <div className="truncate text-[10px] font-bold">{has ? d.name : "🔒"}</div>
-                        <div className="text-[10px] font-black text-amber-300">{d.cost}</div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
+              <p className="mt-1 text-xs text-white/60">Escolha até {slots}. A equipe compartilha a seiva; os aliados IA completam o que faltar.</p>
             )}
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {DEFENDERS.map((d) => {
+                const has = avail.includes(d.id);
+                const on = pick.includes(d.id);
+                return (
+                  <button
+                    key={d.id}
+                    disabled={!has}
+                    onClick={() => setPick((p) => (p.includes(d.id) ? p.filter((x) => x !== d.id) : p.length >= slots ? p : [...p, d.id]))}
+                    className={`relative rounded-xl p-1.5 text-center ring-2 transition ${on ? "bg-[#2ee6c5]/15 ring-[#2ee6c5]" : "bg-black/30 ring-white/6 hover:ring-white/25"} ${!has ? "opacity-40" : ""}`}
+                    title={has ? d.power : "Ainda bloqueado"}
+                  >
+                    <div className="grid place-items-center"><Sprite kind="def" id={d.id} size={52} animate={false} dark={!has} /></div>
+                    <div className="truncate text-[10px] font-bold">{has ? d.name : "🔒"}</div>
+                    <div className="text-[10px] font-black text-amber-300">{d.cost}</div>
+                    {on && <span className="absolute right-1 top-1 rounded-full bg-[#2ee6c5] px-1.5 text-[9px] font-black text-[#04211c]">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
           </section>
 
           {/* função do participante */}
