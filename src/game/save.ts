@@ -1,4 +1,4 @@
-import type { DefId } from "../data/defenders";
+import { DEF_BY_ID, type DefId } from "../data/defenders";
 import { DEFAULT_AURA, DEFAULT_SHOT } from "../data/cosmetics";
 import { sanitizeName } from "../data/rules";
 import { pickQuests, todayKey } from "../data/progression";
@@ -32,6 +32,8 @@ export interface RankEntry {
 export interface Save {
   v: 2;
   name: string;
+  profileReady: boolean;
+  loadout: DefId[];
   coins: number;
   completed: number; // maior fase concluída (0..20)
   stars: Record<number, number>;
@@ -59,6 +61,8 @@ export function defaultSave(): Save {
   return {
     v: 2,
     name: "Guardião",
+    profileReady: false,
+    loadout: ["luminia", "espinheiro", "tronco", "magma", "gelidea", "musgo"],
     coins: 120,
     completed: 0,
     stars: {},
@@ -87,6 +91,8 @@ export function normalize(raw: unknown): Save {
     ...r,
     v: 2,
     name: sanitizeName(typeof r.name === "string" ? r.name : d.name),
+    profileReady: typeof r.profileReady === "boolean" ? r.profileReady : (typeof r.name === "string" && r.name !== "Guardião"),
+    loadout: Array.isArray(r.loadout) ? r.loadout.filter((id): id is DefId => typeof id === "string" && !!DEF_BY_ID[id as DefId]).slice(0, 6) : d.loadout,
     coins: Math.floor(num(r.coins, d.coins)),
     completed: Math.floor(num(r.completed, 0, 0, 50)),
     stars: r.stars && typeof r.stars === "object" ? r.stars : {},
@@ -125,11 +131,13 @@ export function loadSave(): Save {
   }
 }
 
-export function persist(s: Save) {
+export function persist(s: Save): boolean {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(s));
+    const value = JSON.stringify(s);
+    localStorage.setItem(SAVE_KEY, value);
+    return localStorage.getItem(SAVE_KEY) === value;
   } catch {
-    /* armazenamento indisponível: o jogo continua sem salvar */
+    return false;
   }
 }
 
