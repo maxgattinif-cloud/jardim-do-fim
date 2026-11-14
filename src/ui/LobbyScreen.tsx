@@ -58,7 +58,6 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
 
   const lobby = sess ? (sess.role === "host" ? sess.s.lobbyState() : sess.s.lobby) : null;
   const slots = lobby?.slots ?? 6;
-  const choice = lobby?.choice ?? false;
   // mantém a escolha de defensores sincronizada com a sala
   useEffect(() => {
     if (!sess) return;
