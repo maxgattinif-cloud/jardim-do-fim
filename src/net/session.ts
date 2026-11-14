@@ -196,7 +196,10 @@ export class HostSession {
     const choice = total >= CHOICE_MIN_PLAYERS;
     const slots = slotsFor(total);
     const humanLoads: DefId[][] = this.seats.map((s) => (choice ? sanitizeLoadout(s.loadout, DEF_IDS, slots) : []));
-    if (!choice) humanLoads[0] = soloDeck(this.avail, this.level);
+    if (!choice) {
+      humanLoads[0] = sanitizeLoadout(this.seats[0]?.loadout, this.avail, slots);
+      if (!humanLoads[0].length) humanLoads[0] = soloDeck(this.avail, this.level);
+    }
     humanLoads.forEach((l, i) => {
       if (!l.length) humanLoads[i] = aiLoadouts(humanLoads.filter((_, j) => j !== i), 1, total, this.avail)[0];
     });
