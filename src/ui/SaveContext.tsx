@@ -4,7 +4,7 @@ import { DEF_BY_ID, MAX_DEF_LEVEL, UPGRADE_COST, type DefId } from "../data/defe
 import { sanitizeName } from "../data/rules";
 import { ACHIEVEMENTS, applyResult, type ResultSummary } from "../data/progression";
 import { availableDefs } from "../game/decks";
-import { defaultSave, loadSave, normalize, persist, rollDaily, SAVE_KEY, type Save } from "../game/save";
+import { clearSavedData, defaultSave, loadSave, normalize, persist, rollDaily, type Save } from "../game/save";
 import { sound } from "../game/sound";
 import type { MatchResult } from "../game/types";
 
@@ -105,7 +105,7 @@ export function SaveProvider({ children }: { children: ReactNode }) {
       },
       reset: () => {
         try {
-          localStorage.removeItem(SAVE_KEY);
+          clearSavedData();
         } catch {
           /* ignora */
         }
