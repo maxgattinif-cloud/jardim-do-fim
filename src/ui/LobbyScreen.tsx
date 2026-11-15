@@ -358,7 +358,7 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
           </section>
 
           {host ? (
-            <Btn big className="w-full" onClick={() => { const cfg = host.start(); if (cfg) onStart(host.matchHandle()); }} disabled={pick.length < 3}>
+            <Btn big className="w-full" onClick={() => { host.setProfile({ name: save.name, loadout: pick, levels: save.defLevels, aura: save.cosmetics.aura, shot: save.cosmetics.shot, role: myRole }); const cfg = host.start(); if (cfg) onStart(host.matchHandle()); }} disabled={pick.length < 3}>
               ▶ Iniciar {roomMode === "tutorial" ? "treino" : `fase ${level}`}
             </Btn>
           ) : (
