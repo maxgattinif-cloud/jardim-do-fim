@@ -486,7 +486,7 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
               <div className="mt-4 grid gap-2">
                 {handle.isHost ? (
                   <>
-                    {res.r.win && cfg.mode === "campaign" && cfg.level < FINAL_LEVEL && cfg.level > 0 && <Btn big onClick={() => onNext(cfg.level + 1)}>Próxima fase →</Btn>}
+                    {res.r.win && cfg.mode === "campaign" && cfg.level < FINAL_LEVEL && cfg.level > 0 && <Btn big onClick={() => onNext(cfg.level + 1)}>Próxima fase · trocar defensores →</Btn>}
                     {cfg.mode !== "tutorial" && <Btn kind={res.r.win ? "ghost" : "primary"} onClick={() => onNext(cfg.level)}>↻ Jogar de novo</Btn>}
                     {sess.role === "host" && sess.kind !== "offline" ? (
                       <Btn kind="ghost" onClick={onLobby}>Voltar à sala</Btn>
