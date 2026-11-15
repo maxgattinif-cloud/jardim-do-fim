@@ -195,10 +195,10 @@ export class HostSession {
     const total = this.total;
     const choice = total >= CHOICE_MIN_PLAYERS;
     const slots = slotsFor(total);
-    const humanLoads: DefId[][] = this.seats.map((s) => (choice ? sanitizeLoadout(s.loadout, DEF_IDS, slots) : []));
-    if (!choice) {
-      humanLoads[0] = sanitizeLoadout(this.seats[0]?.loadout, this.avail, slots);
-      if (!humanLoads[0].length) humanLoads[0] = soloDeck(this.avail, this.level);
+    // Usa o deck realmente escolhido no lobby e nunca inclui defensores ainda bloqueados.
+    const humanLoads: DefId[][] = this.seats.map((s) => sanitizeLoadout(s.loadout, this.avail, slots));
+    if (!choice && !humanLoads[0]?.length) {
+      humanLoads[0] = soloDeck(this.avail, this.level);
     }
     humanLoads.forEach((l, i) => {
       if (!l.length) humanLoads[i] = aiLoadouts(humanLoads.filter((_, j) => j !== i), 1, total, this.avail)[0];
