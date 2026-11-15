@@ -298,11 +298,11 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
           {/* deck */}
           <section className="glass rounded-2xl p-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl">{solo ? "Kit da fase" : "Seu deck"}</h2>
+              <h2 className="font-display text-2xl">{solo ? "Escolha seus defensores" : "Seu deck"}</h2>
               <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-black ring-1 ring-white/10">{Math.min(pick.length, slots)}/{slots}</span>
             </div>
             {solo ? (
-              <p className="mt-1 text-xs text-white/60">Escolha de 3 a {slots} defensores para esta fase. As plantas recém-desbloqueadas já aparecem disponíveis aqui.</p>
+              <p className="mt-1 text-xs text-white/60">Antes de cada fase, você pode trocar sua equipe: toque nas plantas para adicionar ou remover. Escolha de 3 a {slots} defensores. Plantas recém-desbloqueadas também ficam disponíveis aqui.</p>
             ) : (
               <p className="mt-1 text-xs text-white/60">Escolha até {slots}. A equipe compartilha a seiva; os aliados IA completam o que faltar.</p>
             )}
