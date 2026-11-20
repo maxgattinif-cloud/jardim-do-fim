@@ -171,10 +171,10 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
         key={s.id}
         onClick={() => eng.current?.selectSeed(s.id)}
         aria-label={`${d.name}, custo ${d.cost}`}
-        className={`relative shrink-0 overflow-hidden rounded-xl p-1 text-center ring-2 transition ${compact ? "h-[68px] w-[64px]" : "h-[88px] w-[80px]"} ${hud?.sel === s.id ? "bg-[#2ee6c5]/20 ring-[#2ee6c5]" : "bg-white/7 ring-white/10 hover:ring-white/30"} ${blocked ? "opacity-70" : ""} ${hint ? "anim-pulse-ring ring-amber-300" : ""}`}
+        className={`relative min-w-0 overflow-hidden rounded-lg p-0.5 text-center ring-2 transition ${compact ? "h-[64px]" : "h-[76px]"} ${hud?.sel === s.id ? "bg-[#2ee6c5]/20 ring-[#2ee6c5]" : "bg-white/7 ring-white/10 hover:ring-white/30"} ${blocked ? "opacity-70" : ""} ${hint ? "anim-pulse-ring ring-amber-300" : ""}`}
       >
         <span className="absolute left-1 top-0.5 text-[10px] font-black text-white/45">{i + 1}</span>
-        <span className="grid place-items-center"><Sprite kind="def" id={s.id} size={compact ? 38 : 52} animate={false} /></span>
+        <span className="grid place-items-center"><Sprite kind="def" id={s.id} size={compact ? 28 : 36} animate={false} /></span>
         <span className={`block text-[11px] font-black ${s.afford ? "text-amber-300" : "text-red-400"}`}>{s.cost}</span>
         {s.ready < 1 && <span className="absolute inset-x-0 top-0 bg-black/65" style={{ height: `${(1 - s.ready) * 100}%` }} />}
         <span className="absolute inset-x-0 bottom-0 h-0.5" style={{ background: CLASS_INFO[d.cls].color }} />
@@ -285,7 +285,7 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
 
       <div className={`flex min-h-0 flex-1 ${compact ? "flex-row" : "flex-col"}`}>
         {/* cartas */}
-        <div className={`grid shrink-0 gap-1.5 border-b border-white/8 bg-black/30 p-1.5 ${compact ? "grid-cols-8 border-r" : "grid-cols-4 sm:grid-cols-8"}`}>{cards.map(cardEl)}</div>
+        <div className="grid shrink-0 grid-cols-8 gap-1 border-b border-white/8 bg-black/30 p-1.5">{cards.map(cardEl)}</div>
 
         <div className={`flex min-h-0 min-w-0 flex-1 gap-3 p-1.5 ${wide ? "flex-row" : "flex-col"}`}>
           <div ref={boxRef} className={`relative min-h-0 min-w-0 ${wide || compact ? "grid flex-1 place-items-center" : "shrink-0"}`} style={!wide && !compact ? { height: size.h } : undefined}>
