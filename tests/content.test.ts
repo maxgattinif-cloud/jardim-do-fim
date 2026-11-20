@@ -2,7 +2,7 @@
 import { DEFENDERS, DEF_BY_ID, PLANT_COUNT, MAX_DEF_LEVEL, defStats } from "../src/data/defenders";
 import { ENEMIES, ENEMY_BY_ID, ENEMY_COUNT, WORLD_BOSSES } from "../src/data/enemies";
 import { LEVELS, BIOMES, getLevel } from "../src/data/levels";
-import { FINAL_LEVEL } from "../src/data/rules";
+import { FINAL_LEVEL, slotsFor } from "../src/data/rules";
 import { COMBOS } from "../src/data/combos";
 import { boardFor } from "../src/data/worlds";
 import { availableDefs } from "../src/game/decks";
@@ -24,7 +24,7 @@ function cfg(loadout: string[], opts: { levels?: any; role?: any; seed?: number;
 }
 
 {
-  const selected = ["luminia", "espinheiro", "tronco", "magma", "gelidea", "musgo"] as const;
+  const selected = avail.slice(0, 8);
   const host = new HostSession({
     bus: null,
     room: "TESTE",
@@ -33,7 +33,8 @@ function cfg(loadout: string[], opts: { levels?: any; role?: any; seed?: number;
   });
   host.configure({ level: 2, mode: "campaign" });
   const started = host.start();
-  ok(!!started && started.seats[0].loadout.join(",") === selected.join(","), "modo solo respeita o deck escolhido pelo jogador");
+  ok(slotsFor(1) === 8, "modo solo permite escolher 8 defensores");
+  ok(!!started && started.seats[0].loadout.length === 8 && started.seats[0].loadout.join(",") === selected.join(","), "modo solo envia os 8 defensores escolhidos para a partida");
   host.dispose();
 }
 
