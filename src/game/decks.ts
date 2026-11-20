@@ -10,8 +10,8 @@ const CORE: DefId[] = ["luminia", "espinheiro", "tronco", "magma"];
 const rank = (d: DefDef) => (d.unlock.kind === "start" ? 0 : d.unlock.kind === "level" ? d.unlock.n : 8);
 
 /**
- * Kit fixo do modo solo (1 participante, sem escolha): 4 defensores-base + 2 destaques.
- * O destaque 1 é sempre o desbloqueio mais recente; o 2 muda a cada fase (variedade).
+ * Kit padrão do modo solo: 4 defensores-base + até 4 destaques.
+ * Os destaques priorizam os desbloqueios mais recentes e variam conforme a fase.
  */
 export function soloDeck(avail: DefId[], level = 1): DefId[] {
   const core = CORE.filter((id) => avail.includes(id));
