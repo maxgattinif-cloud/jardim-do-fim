@@ -285,7 +285,7 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
 
       <div className={`flex min-h-0 flex-1 ${compact ? "flex-row" : "flex-col"}`}>
         {/* cartas */}
-        <div className={compact ? "scroll-y flex shrink-0 flex-col gap-1.5 border-r border-white/8 bg-black/30 p-1.5" : "hide-scroll flex shrink-0 gap-2 overflow-x-auto border-b border-white/8 bg-black/25 px-2 py-1.5"}>{cards.map(cardEl)}</div>
+        <div className={`grid shrink-0 gap-1.5 border-b border-white/8 bg-black/30 p-1.5 ${compact ? "grid-cols-8 border-r" : "grid-cols-4 sm:grid-cols-8"}`}>{cards.map(cardEl)}</div>
 
         <div className={`flex min-h-0 min-w-0 flex-1 gap-3 p-1.5 ${wide ? "flex-row" : "flex-col"}`}>
           <div ref={boxRef} className={`relative min-h-0 min-w-0 ${wide || compact ? "grid flex-1 place-items-center" : "shrink-0"}`} style={!wide && !compact ? { height: size.h } : undefined}>
