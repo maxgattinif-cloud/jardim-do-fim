@@ -16,7 +16,7 @@ export const PLAYER_STEP = 0.35; // +35% de ameaça por participante extra
 export const levelMult = (level: number) => 1 + LEVEL_STEP * (Math.max(1, level) - 1);
 export const playerMult = (n: number) => 1 + PLAYER_STEP * (Math.max(1, n) - 1);
 export const playerHpMult = (n: number) => 1 + 0.1 * (Math.max(1, n) - 1);
-export const slotsFor = (n: number) => Math.max(3, 7 - n);
+export const slotsFor = (n: number) => (n <= 1 ? 8 : Math.max(3, 7 - n));
 export const startSeiva = (n: number) => 175 + 60 * (Math.max(1, n) - 1);
 export const threatBudget = (level: number, n: number) => Math.round(8 * levelMult(level) * playerMult(n));
 export const worldOf = (level: number) => Math.min(WORLD_COUNT - 1, Math.max(0, Math.floor((Math.max(1, level) - 1) / LEVELS_PER_WORLD)));
