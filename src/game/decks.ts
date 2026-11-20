@@ -3,7 +3,17 @@ import { slotsFor } from "../data/rules";
 
 /** Defensores liberados dado o progresso (níveis concluídos e conquistas). */
 export function availableDefs(completedLevels: number, achievements: string[] = []): DefId[] {
-  return DEFENDERS.filter((d) => d.unlock.kind === "start" || (d.unlock.kind === "level" && completedLevels >= d.unlock.n) || (d.unlock.kind === "achv" && achievements.includes(d.unlock.id))).map((d) => d.id);
+  // Evita duas liberações simultâneas na mesma conclusão: a recompensa por fase
+  // tem prioridade; uma conquista pendente é liberada na conclusão seguinte.
+  const levelUnlockAtThisMilestone = DEFENDERS.some(
+    (d) => d.unlock.kind === "level" && d.unlock.n === completedLevels
+  );
+  return DEFENDERS.filter(
+    (d) =>
+      d.unlock.kind === "start" ||
+      (d.unlock.kind === "level" && completedLevels >= d.unlock.n) ||
+      (d.unlock.kind === "achv" && achievements.includes(d.unlock.id) && !levelUnlockAtThisMilestone)
+  ).map((d) => d.id);
 }
 
 const CORE: DefId[] = ["luminia", "espinheiro", "tronco", "magma"];
