@@ -92,7 +92,7 @@ export function normalize(raw: unknown): Save {
     v: 2,
     name: sanitizeName(typeof r.name === "string" ? r.name : d.name),
     profileReady: typeof r.profileReady === "boolean" ? r.profileReady : (typeof r.name === "string" && r.name !== "Guardião"),
-    loadout: Array.isArray(r.loadout) ? r.loadout.filter((id): id is DefId => typeof id === "string" && !!DEF_BY_ID[id as DefId]).slice(0, 6) : d.loadout,
+    loadout: Array.isArray(r.loadout) ? r.loadout.filter((id): id is DefId => typeof id === "string" && !!DEF_BY_ID[id as DefId]).slice(0, 8) : d.loadout,
     coins: Math.floor(num(r.coins, d.coins)),
     completed: Math.floor(num(r.completed, 0, 0, 50)),
     stars: r.stars && typeof r.stars === "object" ? r.stars : {},
