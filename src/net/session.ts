@@ -165,6 +165,12 @@ export class HostSession {
     this.allies = Math.max(0, Math.min(MAX_PLAYERS - this.seats.length, Math.floor(n)));
     this.broadcastLobby();
   }
+  /** Atualiza os defensores liberados quando o jogador avança de fase. */
+  setAvailableDefs(avail: DefId[]) {
+    this.avail = [...avail];
+    this.broadcastLobby();
+  }
+
   setProfile(p: Partial<Profile>) {
     const me = this.seats[0];
     if (p.name) me.name = sanitizeName(p.name);
