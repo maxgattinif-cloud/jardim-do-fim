@@ -27,7 +27,7 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
   const [pick, setPick] = useState<DefId[]>(() => {
-    const saved = sanitizeLoadout(save.loadout, avail, 6);
+    const saved = sanitizeLoadout(save.loadout, avail, 8);
     return saved.length ? saved : soloDeck(avail, init.level);
   });
   const [myRole, setMyRole] = useState<"comandante" | "agricultor" | "atirador" | "curandeiro" | "guarda" | "tatico">(ROLE_ORDER[0]);
