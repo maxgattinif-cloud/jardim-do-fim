@@ -123,7 +123,7 @@ export class HostSession {
       name: sanitizeName(p.name ?? "Guardião"),
       role: roleOf(p.role, this.seats.length),
       kind: "human",
-      loadout: sanitizeLoadout(p.loadout, DEF_IDS, 6),
+      loadout: sanitizeLoadout(p.loadout, DEF_IDS, 8),
       levels: sanitizeLevels(p.levels),
       aura: cosmeticOr(p.aura, DEFAULT_AURA, "aura"),
       shot: cosmeticOr(p.shot, DEFAULT_SHOT, "shot"),
