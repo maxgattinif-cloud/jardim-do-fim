@@ -272,7 +272,7 @@ export class HostSession {
         break;
       case "lobby":
         if (this.phase !== "lobby") break;
-        if (Array.isArray(msg.loadout)) seat.loadout = sanitizeLoadout(msg.loadout, DEF_IDS, 6);
+        if (Array.isArray(msg.loadout)) seat.loadout = sanitizeLoadout(msg.loadout, DEF_IDS, 8);
         if (msg.levels) seat.levels = sanitizeLevels(msg.levels);
         if (msg.aura) seat.aura = cosmeticOr(msg.aura, DEFAULT_AURA, "aura");
         if (msg.shot) seat.shot = cosmeticOr(msg.shot, DEFAULT_SHOT, "shot");
