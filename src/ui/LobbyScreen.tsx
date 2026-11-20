@@ -58,6 +58,11 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
 
   const lobby = sess ? (sess.role === "host" ? sess.s.lobbyState() : sess.s.lobby) : null;
   const slots = lobby?.slots ?? 8;
+  // A sessão pode sobreviver à troca de fase; sincronize a lista de desbloqueios.
+  useEffect(() => {
+    if (sess?.role === "host") sess.s.setAvailableDefs(avail);
+  }, [sess, avail]);
+
   // mantém a escolha de defensores sincronizada com a sala
   useEffect(() => {
     if (!sess) return;
@@ -357,8 +362,25 @@ export function LobbyScreen({ init, sess, setSess, onStart, onBack }: { init: Lo
             {!seats.some((s) => s.loadout.some((d) => DEF_BY_ID[d].air)) && !solo && <p className="mt-1 text-xs text-amber-300">⚠ Ninguém leva defensor que acerte voadores.</p>}
           </section>
 
+          {err && <p role="alert" className="rounded-xl bg-red-500/15 p-3 text-sm text-red-200 ring-1 ring-red-400/30">⚠ {err}</p>}
           {host ? (
-            <Btn big className="w-full" onClick={() => { host.setProfile({ name: save.name, loadout: pick, levels: save.defLevels, aura: save.cosmetics.aura, shot: save.cosmetics.shot, role: myRole }); const cfg = host.start(); if (cfg) onStart(host.matchHandle()); }} disabled={pick.length < 3}>
+            <Btn big className="w-full" onClick={() => {
+            // A sessão permanece viva entre fases. Atualiza primeiro os desbloqueios
+            // do progresso atual para não descartar as plantas liberadas recentemente.
+            host.setAvailableDefs(avail);
+            const chosen = sanitizeLoadout(pick, avail, slots);
+            if (chosen.length !== pick.length) {
+              setErr("Uma ou mais plantas selecionadas não estão liberadas nesta fase. Revise sua equipe antes de iniciar.");
+              return;
+            }
+            host.setProfile({ name: save.name, loadout: chosen, levels: save.defLevels, aura: save.cosmetics.aura, shot: save.cosmetics.shot, role: myRole });
+            const cfg = host.start();
+            if (!cfg || cfg.seats[0]?.loadout.length !== chosen.length || cfg.seats[0]?.loadout.some((id, i) => id !== chosen[i])) {
+              setErr("A equipe não foi transferida corretamente. A partida não foi iniciada; tente novamente.");
+              return;
+            }
+            onStart(host.matchHandle());
+          }} disabled={pick.length < 3}>
               ▶ Iniciar {roomMode === "tutorial" ? "treino" : `fase ${level}`}
             </Btn>
           ) : (
