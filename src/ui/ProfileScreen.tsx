@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Btn, Screen } from "./common";
 import { useSave } from "./SaveContext";
 
 export function ProfileScreen({ onComplete }: { onComplete: () => void }) {
   const { save, register } = useSave();
-  const [name, setName] = useState(save.name === "Guardião" ? "" : save.name);
+  const nameRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
 
   const submit = () => {
-    const clean = name.trim();
+    const clean = nameRef.current?.value.trim() ?? "";
     if (clean.length < 2) {
       setError("Digite um nome com pelo menos 2 caracteres.");
       return;
@@ -26,8 +26,9 @@ export function ProfileScreen({ onComplete }: { onComplete: () => void }) {
           id="player-name"
           autoFocus
           maxLength={16}
-          value={name}
-          onChange={(e) => { setName(e.target.value); setError(""); }}
+          defaultValue={save.name === "Guardião" ? "" : save.name}
+          ref={nameRef}
+          onChange={() => setError("")}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder="Como quer aparecer no jogo?"
           className="mt-2 w-full rounded-xl bg-black/40 px-4 py-3 text-center text-lg font-bold ring-1 ring-white/20 outline-none focus:ring-[#2ee6c5]"
