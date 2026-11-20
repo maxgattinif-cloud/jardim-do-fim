@@ -238,7 +238,7 @@ export class GardenEngine {
   waves = 3;
   waveStarts: number[] = [];
   waveIdx = 0;
-  skyT = 3;
+  skyT = 1;
   banner = "";
   bannerT = 0;
   shake = 0;
@@ -830,7 +830,7 @@ export class GardenEngine {
 
     this.skyT -= dt;
     if (this.skyT <= 0 && !this.mods.has("noite")) {
-      this.skyT = tutorial ? 6 : this.mods.has("chuva") ? 4.5 : 9;
+      this.skyT = tutorial ? 4 : this.mods.has("chuva") ? 2.5 : 7;
       this.spawnSun(GX + 40 + this.rng() * (COLS * CW - 80), 0, 25, true);
     } else if (this.skyT <= 0) this.skyT = 9;
 
