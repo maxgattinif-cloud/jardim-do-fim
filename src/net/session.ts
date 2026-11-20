@@ -168,7 +168,7 @@ export class HostSession {
   setProfile(p: Partial<Profile>) {
     const me = this.seats[0];
     if (p.name) me.name = sanitizeName(p.name);
-    if (p.loadout) me.loadout = sanitizeLoadout(p.loadout, DEF_IDS, 6);
+    if (p.loadout) me.loadout = sanitizeLoadout(p.loadout, DEF_IDS, 8);
     if (p.levels) me.levels = sanitizeLevels(p.levels);
     if (p.aura) me.aura = cosmeticOr(p.aura, DEFAULT_AURA, "aura");
     if (p.shot) me.shot = cosmeticOr(p.shot, DEFAULT_SHOT, "shot");
