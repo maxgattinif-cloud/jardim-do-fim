@@ -161,7 +161,16 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
     setText("");
   };
 
-  const cards = hud?.seeds ?? [];
+  // A lista de cartas vem do deck confirmado na configuração da partida.
+  // O HUD fornece apenas estado dinâmico; não decide quais cartas existem.
+  const selectedLoadout = cfg.seats[handle.mySeat]?.loadout ?? [];
+  const hudSeeds = new Map((hud?.seeds ?? []).map((seed) => [seed.id, seed]));
+  const cards = selectedLoadout.map((id) => hudSeeds.get(id) ?? {
+    id,
+    ready: 0,
+    afford: false,
+    cost: DEF_BY_ID[id].cost,
+  });
   const cardEl = (s: (typeof cards)[number], i: number) => {
     const d = DEF_BY_ID[s.id];
     const blocked = !s.afford || s.ready < 1;
@@ -171,7 +180,7 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
         key={s.id}
         onClick={() => eng.current?.selectSeed(s.id)}
         aria-label={`${d.name}, custo ${d.cost}`}
-        className={`relative min-w-0 overflow-hidden rounded-lg p-0.5 text-center ring-2 transition ${compact ? "h-[64px]" : "h-[76px]"} ${hud?.sel === s.id ? "bg-[#2ee6c5]/20 ring-[#2ee6c5]" : "bg-white/7 ring-white/10 hover:ring-white/30"} ${blocked ? "opacity-70" : ""} ${hint ? "anim-pulse-ring ring-amber-300" : ""}`}
+        className={`relative w-[68px] shrink-0 overflow-hidden rounded-lg p-0.5 text-center ring-2 transition ${compact ? "h-[64px]" : "h-[76px]"} ${hud?.sel === s.id ? "bg-[#2ee6c5]/20 ring-[#2ee6c5]" : "bg-white/7 ring-white/10 hover:ring-white/30"} ${blocked ? "opacity-70" : ""} ${hint ? "anim-pulse-ring ring-amber-300" : ""}`}
       >
         <span className="absolute left-1 top-0.5 text-[10px] font-black text-white/45">{i + 1}</span>
         <span className="grid place-items-center"><Sprite kind="def" id={s.id} size={compact ? 28 : 36} animate={false} /></span>
@@ -283,17 +292,12 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
         <span className="shrink-0 text-white/35">Fase {cfg.level}/50</span>
       </div>
 
-      <div className={`flex min-h-0 flex-1 ${compact ? "flex-row" : "flex-col"}`}>
-        {/* cartas */}
-        {compact ? (
-          <div className="grid h-full w-[124px] shrink-0 auto-rows-min grid-cols-2 content-start gap-1 overflow-y-auto border-r border-white/8 bg-black/30 p-1.5">
-            {cards.map(cardEl)}
-          </div>
-        ) : (
-          <div className="grid w-full shrink-0 grid-cols-8 gap-1 border-b border-white/8 bg-black/30 p-1.5">
-            {cards.map(cardEl)}
-          </div>
-        )}
+      <div className="flex min-h-0 flex-1 flex-col">
+        {/* Faixa rolável: cada carta mantém largura própria, sem ser comprimida ou escondida. */}
+        <div aria-label={`Cartas disponíveis: ${cards.length} de ${selectedLoadout.length}`} className="flex w-full shrink-0 items-start gap-1 overflow-x-auto border-b border-white/8 bg-black/30 p-1.5">
+          <span className="sticky left-0 z-10 flex h-[64px] w-8 shrink-0 items-center justify-center rounded-md bg-black/70 text-[10px] font-black text-[#2ee6c5]">{cards.length}/{selectedLoadout.length}</span>
+          {cards.map(cardEl)}
+        </div>
 
         <div className={`flex min-h-0 min-w-0 flex-1 gap-3 p-1.5 ${wide ? "flex-row" : "flex-col"}`}>
           <div ref={boxRef} className={`relative min-h-0 min-w-0 ${wide || compact ? "grid flex-1 place-items-center" : "shrink-0"}`} style={!wide && !compact ? { height: size.h } : undefined}>
