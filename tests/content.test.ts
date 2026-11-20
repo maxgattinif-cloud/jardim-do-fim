@@ -38,6 +38,27 @@ function cfg(loadout: string[], opts: { levels?: any; role?: any; seed?: number;
   host.dispose();
 }
 {
+  // Reproduz uma sessão que atravessa fases: a lista de desbloqueios aumenta
+  // depois da vitória, mas a sessão do anfitrião continua a mesma.
+  const initialAvail = availableDefs(0, []);
+  const progressedAvail = availableDefs(5, []);
+  const newlyUnlocked = progressedAvail.filter((id) => !initialAvail.includes(id));
+  const selected = [...initialAvail, ...newlyUnlocked].slice(0, 8);
+  const host = new HostSession({
+    bus: null,
+    room: "TESTE-DESBLOQUEIOS",
+    profile: { name: "Teste", levels: {}, aura: "aura_esmeralda", shot: "shot_padrao", loadout: initialAvail },
+    avail: initialAvail,
+  });
+  host.configure({ level: 6, mode: "campaign" });
+  host.setAvailableDefs(progressedAvail);
+  host.setProfile({ loadout: selected });
+  const started = host.start();
+  ok(newlyUnlocked.length > 0 && selected.length === 8, "teste de regressão inclui plantas liberadas após o início da sessão");
+  ok(!!started && started.seats[0].loadout.length === selected.length && started.seats[0].loadout.every((id, i) => id === selected[i]), "sessão persistente mantém todas as 8 plantas, inclusive as recém-liberadas", `selecionadas ${selected.length}, recebidas ${started?.seats[0].loadout.length ?? 0}`);
+  host.dispose();
+}
+{
   // Reproduz a escolha do jogador que removeu as plantas iniciais e selecionou seis novas.
   const selected = avail.filter((id) => !["luminia", "espinheiro", "tronco", "magma"].includes(id)).slice(0, 6);
   const host = new HostSession({
