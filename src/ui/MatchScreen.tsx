@@ -285,7 +285,15 @@ export function MatchScreen({ handle, sess, onExit, onNext, onLobby }: { handle:
 
       <div className={`flex min-h-0 flex-1 ${compact ? "flex-row" : "flex-col"}`}>
         {/* cartas */}
-        <div className="grid shrink-0 grid-cols-8 gap-1 border-b border-white/8 bg-black/30 p-1.5">{cards.map(cardEl)}</div>
+        {compact ? (
+          <div className="grid h-full w-[124px] shrink-0 auto-rows-min grid-cols-2 content-start gap-1 overflow-y-auto border-r border-white/8 bg-black/30 p-1.5">
+            {cards.map(cardEl)}
+          </div>
+        ) : (
+          <div className="grid w-full shrink-0 grid-cols-8 gap-1 border-b border-white/8 bg-black/30 p-1.5">
+            {cards.map(cardEl)}
+          </div>
+        )}
 
         <div className={`flex min-h-0 min-w-0 flex-1 gap-3 p-1.5 ${wide ? "flex-row" : "flex-col"}`}>
           <div ref={boxRef} className={`relative min-h-0 min-w-0 ${wide || compact ? "grid flex-1 place-items-center" : "shrink-0"}`} style={!wide && !compact ? { height: size.h } : undefined}>
