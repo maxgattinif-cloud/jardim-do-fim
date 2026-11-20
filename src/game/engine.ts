@@ -452,6 +452,11 @@ export class GardenEngine {
   cdKey(seat: number, id: DefId) {
     return `${seat}:${id}`;
   }
+  /** Recarga exclusiva das cartas: 25% menor, sem alterar o relógio do jogo. */
+  cardRecharge(seat: number, id: DefId) {
+    const role = roleOfSeat(this, seat);
+    return DEF_BY_ID[id].recharge * 0.75 * (role === "comandante" ? 0.85 : 1);
+  }
   cdRemain(seat: number, id: DefId) {
     if (this.mirror) return Math.max(0, (this.cdLeft[this.cdKey(seat, id)] ?? 0) - (this.time - this.cdAt));
     return Math.max(0, (this.cd[this.cdKey(seat, id)] ?? 0) - this.time);
@@ -468,7 +473,7 @@ export class GardenEngine {
     const lv = clamp(Math.floor(s.levels[type] ?? 1), 1, MAX_DEF_LEVEL);
     const st = defStats(def, lv);
     this.sun -= def.cost;
-    this.cd[this.cdKey(seat, type)] = this.time + def.recharge * (role === "comandante" ? 0.85 : 1);
+    this.cd[this.cdKey(seat, type)] = this.time + this.cardRecharge(seat, type);
     const timer = type === "luminia" ? Math.min(6, st.interval * 0.75) : type === "ambar" ? st.interval * 0.6 : type === "sino" ? 6 : type === "magma" ? def.interval : type === "vazio" ? def.interval : 1;
     const hpMul = (role === "guarda" ? 1.25 : 1) * (role === "curandeiro" ? 1.1 : 1);
     this.plants.push({ id: this.nid++, type, col, row, hp: Math.round(st.hp * hpMul), maxHp: Math.round(st.hp * hpMul), timer: timer || 1, state: type === "magma" ? 1 : type === "vazio" ? 2 : 0, charge: 0, flash: 0, owner: seat, born: this.time, lv, dmg: st.dmg, interval: st.interval * (lv >= 5 ? 0.85 : 1), spent: false, combo: "", slowT: 0, ghostT: 0, stored: 0 });
@@ -1477,7 +1482,7 @@ export class GardenEngine {
       seeds: my.loadout.map((id) => {
         const d = DEF_BY_ID[id];
         const left = this.cdRemain(this.mySeat, id);
-        return { id, ready: clamp(1 - left / d.recharge, 0, 1), afford: this.sun >= d.cost, cost: d.cost };
+        return { id, ready: clamp(1 - left / this.cardRecharge(this.mySeat, id), 0, 1), afford: this.sun >= d.cost, cost: d.cost };
       }),
       sel: this.sel,
       shovel: this.shovel,
