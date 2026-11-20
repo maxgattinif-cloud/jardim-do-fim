@@ -37,6 +37,26 @@ function cfg(loadout: string[], opts: { levels?: any; role?: any; seed?: number;
   ok(!!started && started.seats[0].loadout.length === 8 && started.seats[0].loadout.join(",") === selected.join(","), "modo solo envia os 8 defensores escolhidos para a partida");
   host.dispose();
 }
+{
+  // Reproduz a escolha do jogador que removeu as plantas iniciais e selecionou seis novas.
+  const selected = avail.filter((id) => !["luminia", "espinheiro", "tronco", "magma"].includes(id)).slice(0, 6);
+  const host = new HostSession({
+    bus: null,
+    room: "TESTE6",
+    profile: { name: "Teste", levels: {}, aura: "aura_esmeralda", shot: "shot_padrao", loadout: selected },
+    avail,
+  });
+  host.configure({ level: 21, mode: "campaign" });
+  const started = host.start();
+  let hudCount = 0;
+  if (started) {
+    const engine = new GardenEngine(fakeCanvas(), started, { onHud: (hud) => { hudCount = hud.seeds.length; } });
+    engine.emit();
+  }
+  ok(selected.length === 6 && !!started && started.seats[0].loadout.length === 6, "seis plantas não iniciais permanecem no deck da partida", `selecionadas ${selected.length}, recebidas ${started?.seats[0].loadout.length ?? 0}`);
+  ok(hudCount === 6, "HUD entrega as seis cartas escolhidas ao jogo", `cartas no HUD: ${hudCount}`);
+  host.dispose();
+}
 
 console.log("\n[A] 50 fases / 5 mundos");
 ok(LEVELS.length === 50 && FINAL_LEVEL === 50, "exatamente 50 fases cadastradas", `${LEVELS.length}`);
