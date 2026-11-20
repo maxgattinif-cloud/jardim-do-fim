@@ -28,7 +28,6 @@ export function ProfileScreen({ onComplete }: { onComplete: () => void }) {
           maxLength={16}
           defaultValue={save.name === "Guardião" ? "" : save.name}
           ref={nameRef}
-          onChange={() => setError("")}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder="Como quer aparecer no jogo?"
           className="mt-2 w-full rounded-xl bg-black/40 px-4 py-3 text-center text-lg font-bold ring-1 ring-white/20 outline-none focus:ring-[#2ee6c5]"
