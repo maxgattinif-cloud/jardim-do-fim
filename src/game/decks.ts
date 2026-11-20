@@ -21,11 +21,11 @@ export function soloDeck(avail: DefId[], level = 1): DefId[] {
   const feat: DefId[] = [];
   if (others[0]) feat.push(others[0]);
   const rest = others.slice(1);
-  for (let i = 0; feat.length < 2 && rest.length && i < 12; i++) {
+  for (let i = 0; feat.length < 4 && rest.length && i < 24; i++) {
     const pick = rest[(level * 3 + i) % rest.length];
     if (!feat.includes(pick)) feat.push(pick);
   }
-  return [...core, ...feat].slice(0, 6);
+  return [...core, ...feat].slice(0, 8);
 }
 
 /** Aliados IA completam o que falta ao time (evita repetir o que os humanos já levaram). */
